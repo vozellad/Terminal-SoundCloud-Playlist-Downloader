@@ -10,7 +10,8 @@ from selenium.common.exceptions import TimeoutException
 from subprocess import Popen
 
 def main():
-	q = "Are you running this script in the folder or directory you want to files to be downloaded in? Y/n\n"
+	q = ("Are you running this script in the folder or directory "
+		+ "you want to files to be downloaded in? Y/n\n")
 	if (input(q) == 'n'):
 		print("Make sure to do that.")
 		return
