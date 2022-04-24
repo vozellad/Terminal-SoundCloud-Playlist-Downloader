@@ -10,16 +10,12 @@ from selenium.common.exceptions import TimeoutException
 from subprocess import Popen
 
 def main():
-	'''
 	q = "Are you running this script in the folder or directory you want to files to be downloaded in? Y/n\n"
 	if (input(q) == 'n'):
 		print("Make sure to do that.")
 		return
-	'''
 
-	#url = input("Enter SoundCloud playlist url:\n")
-	#url = "https://soundcloud.com/engzaiedi/sets/dj-collection"
-	url = "https://soundcloud.com/anonagon/sets/best-of-soundclown"
+	url = input("Enter SoundCloud playlist url:\n")
 
 	# No other site is supported
 	if "soundcloud.com" not in url.lower():
@@ -71,7 +67,7 @@ def main():
 			item.get_attribute("href").split('?')[0]
 		)
 
-	#print('\n'.join(tracklist))
+	#print('\n'.join(tracklist)) # testing code
 
 	# I could read from the terminal to make sure I'm getting 
 	# the keywords right, but I don't need to because 
