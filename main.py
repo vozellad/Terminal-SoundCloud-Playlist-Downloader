@@ -23,7 +23,7 @@ def main():
 	options = Options()
 	options.headless = True
 	driver = webdriver.Firefox(options=options)
-	print ("Headless Firefox Initialized")
+	print("Headless Firefox Initialized")
 	
 	# Try to go to the url unless it's invalid
 	try:
@@ -87,7 +87,7 @@ def main():
 	# Tracks go in this folder
 	subprocess.Popen("mkdir -p tracks", shell=True).wait()
 
-	print(len(tracklist), "tracks to download.")
+	print(len(tracklist), "tracks to download.\n")
 
 	for i, link in enumerate(tracklist):
 		# Get format to download track
@@ -106,9 +106,9 @@ def main():
 		
 		subprocess.Popen(command + link, shell=True).wait()
 		
-		print("Track(s) downloaded:", i + 1)
+		print("Track(s) downloaded:", i + 1, '\n')
 
-
+	print("Tracks downloaded in the 'tracks' folder.")
 
 	driver.quit()
 
