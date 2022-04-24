@@ -23,14 +23,12 @@ def main():
 	options = Options()
 	options.headless = True
 	driver = webdriver.Firefox(options=options)
-	print("Headless Firefox Initialized")
 	
 	# Try to go to the url unless it's invalid
 	try:
 		driver.get(url)
 	except WebDriverException:
 		print("Not a valid url.")
-		driver.quit()
 		return
 	
 	# Check playlist is available by comparing expected text
@@ -45,18 +43,16 @@ def main():
 	
 		if expected_text in element_text:
 			print("This playlist is not available. Is it private?")
-			driver.quit()
 			return
 	except TimeoutException:
 		pass
 
-	print("All guards passed.")
+	# All guards passed at this point
 
-	# Scroll to bottom of webpage to display all tracks
-	print("Scrolling to bottom of webpage.")
 	# Get scroll height
 	last_height = driver.execute_script("return document.body.scrollHeight")
 
+	# Scroll to bottom of webpage to display all tracks
 	while True:
 		# Scroll down to bottom
 		driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -71,8 +67,6 @@ def main():
 		last_height = new_height
 
 	# Get list of tracks as an element
-	print("Getting tracks.")
-
 	xpath = (".//*[@class='trackItem__trackTitle "
 		+ "sc-link-dark sc-link-primary sc-font-light']")
 	element_tracklist = driver.find_elements(By.XPATH, xpath)
@@ -103,14 +97,17 @@ def main():
 		form = out.split('\n')[-2].split(' ')[0]
 
 		command = f"youtube-dl -o 'tracks/%(title)s.%(ext)s' -f {form} "
-		
+		print(command + link)
 		subprocess.Popen(command + link, shell=True).wait()
 		
 		print("Track(s) downloaded:", i + 1, '\n')
 
 	print("Tracks downloaded in the 'tracks' folder.")
 
-	driver.quit()
-
 if __name__ == "__main__":
+	driver = None
+
 	main()
+
+	if driver != None:
+		driver.quit()
