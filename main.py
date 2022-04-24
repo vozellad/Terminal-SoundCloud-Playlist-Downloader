@@ -7,22 +7,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import TimeoutException
 
-from subprocess import Popen
+import subprocess
+import io
+from time import sleep
 
 def main():
-	q = ("Are you running this script in the folder or directory "
-		+ "you want to files to be downloaded in? Y/n\n")
-	if (input(q) == 'n'):
-		print("Make sure to do that.")
-		return
-
 	url = input("Enter SoundCloud playlist url:\n")
 
 	# No other site is supported
 	if "soundcloud.com" not in url.lower():
 		print("Can't find soundcloud website in", url)
 		return
-
+	
 	# Run headless browser
 	options = Options()
 	options.headless = True
@@ -56,7 +52,27 @@ def main():
 
 	print("All guards passed.")
 
+	# Scroll to bottom of webpage to display all tracks
+	print("Scrolling to bottom of webpage.")
+	# Get scroll height
+	last_height = driver.execute_script("return document.body.scrollHeight")
+
+	while True:
+		# Scroll down to bottom
+		driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+		# Wait to load page
+		sleep(1)
+
+		# Calculate new scroll height and compare with last scroll height
+		new_height = driver.execute_script("return document.body.scrollHeight")
+		if new_height == last_height:
+			break
+		last_height = new_height
+
 	# Get list of tracks as an element
+	print("Getting tracks.")
+
 	xpath = (".//*[@class='trackItem__trackTitle "
 		+ "sc-link-dark sc-link-primary sc-font-light']")
 	element_tracklist = driver.find_elements(By.XPATH, xpath)
@@ -68,13 +84,29 @@ def main():
 			item.get_attribute("href").split('?')[0]
 		)
 
-	#print('\n'.join(tracklist)) # testing code
+	# Tracks go in this folder
+	subprocess.Popen("mkdir -p tracks", shell=True).wait()
 
-	# I could read from the terminal to make sure I'm getting 
-	# the keywords right, but I don't need to because 
-	# SoundCloud is consistent for now.
-	for link in tracklist:
-		Popen("youtube-dl -f http_mp3_128 " + link, shell=True).wait()
+	print(len(tracklist), "tracks to download.")
+
+	for i, link in enumerate(tracklist):
+		# Get format to download track
+		proc = subprocess.Popen(
+			f"youtube-dl -F " + link, 
+			shell=True, 
+			stdout=subprocess.PIPE, 
+			stderr=subprocess.PIPE,
+			universal_newlines=True
+		)
+		
+		out, err = proc.communicate()
+		form = out.split('\n')[-2].split(' ')[0]
+
+		command = f"youtube-dl -o 'tracks/%(title)s.%(ext)s' -f {form} "
+		
+		subprocess.Popen(command + link, shell=True).wait()
+		
+		print("Track(s) downloaded:", i + 1)
 
 
 
