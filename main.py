@@ -107,7 +107,11 @@ def main():
 if __name__ == "__main__":
 	driver = None
 
-	main()
+	try:
+		main()
+	# Make sure browser closes if program is exited early
+	except KeyboardInterrupt:
+		print("\tProgram closed")
 
 	if driver != None:
 		driver.quit()
